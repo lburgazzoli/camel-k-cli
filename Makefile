@@ -6,4 +6,4 @@ GOFLAGS = -ldflags "$(GOLDFLAGS)" -trimpath
 default: build
 
 build:
-	go build $(GOFLAGS) -o kamel ./pkg/cmd/kamel/*.go
+	go build $(GOFLAGS) -o kamel *.go
