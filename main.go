@@ -2,20 +2,19 @@ package main
 
 import (
 	"fmt"
+	"github.com/lburgazzoli/camel-k-cli/pkg/cmd"
+	"github.com/urfave/cli/v2"
 	"log"
 	"os"
 
-	"github.com/urfave/cli/v2"
 	"github.com/urfave/cli/v2/altsrc"
 )
-
-// GitCommit --
-var GitCommit string
 
 func main() {
 	var kubeconf string
 	var namespace string
 	var dependencies cli.StringSlice
+	var debug bool
 
 	flags := []cli.Flag{
 		&cli.StringFlag{
@@ -41,7 +40,13 @@ func main() {
 		altsrc.NewStringSliceFlag(&cli.StringSliceFlag{
 			Name:        "dependency",
 			Usage:       "dependency",
+			Aliases:     []string{"d"},
 			Destination: &dependencies,
+		}),
+		altsrc.NewBoolFlag(&cli.BoolFlag{
+			Name:        "debug",
+			Usage:       "debug",
+			Destination: &debug,
 		}),
 	}
 
@@ -49,22 +54,24 @@ func main() {
 		Name:                 "kamel",
 		Usage:                "kamel",
 		EnableBashCompletion: true,
-		Before:               altsrc.InitInputSourceWithContext(flags, altsrc.NewYamlSourceFromFlagFunc("kamelconfig")),
+		Before:               cmd.InitInputSourceWithContext(flags, "kamelconfig", "kamel."),
 		Flags:                flags,
 		Commands: []*cli.Command{
 			{
-				Name:  "run",
-				Usage: "run",
-				Flags: runFlags,
+				Name:   "run",
+				Usage:  "run",
+				Flags:  runFlags,
+				Before: cmd.InitInputSourceWithContext(runFlags, "kamelconfig", "kamel.run."),
 				Action: func(c *cli.Context) error {
-					fmt.Println(dependencies)
+					fmt.Println("dependencies:", dependencies)
+					fmt.Println("debug:", debug)
 					return nil
 				},
 			},
 		},
 		Action: func(c *cli.Context) error {
-			fmt.Println(kubeconf)
-			fmt.Println(namespace)
+			fmt.Println("kc:", kubeconf)
+			fmt.Println("ns:", namespace)
 			return nil
 		},
 	}
