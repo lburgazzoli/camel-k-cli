@@ -7,3 +7,6 @@ default: build
 
 build:
 	go build $(GOFLAGS) -o kamel *.go
+clean:
+	go clean
+	rm kamel	
